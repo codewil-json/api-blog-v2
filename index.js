@@ -47,6 +47,12 @@ app.get('/docs', (req, res) => {
         path: '/health',
         description: 'Checks the API and database status.'
       },
+      login: {
+        method: 'POST',
+        path: '/login',
+        description: 'Authenticates the admin using ADMIN_EMAIL and ADMIN_PASSWORD from the environment.',
+        body: ['email', 'password']
+      },
       posts: [
         {
           method: 'GET',
@@ -84,6 +90,41 @@ app.get('/docs', (req, res) => {
           description: 'Deletes a post by slug.'
         }
       ]
+    }
+  });
+});
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body || {};
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    return res.status(500).json({
+      error: 'Admin credentials are not configured in the environment.'
+    });
+  }
+
+  if (!email || !password) {
+    return res.status(400).json({
+      error: 'Email and password are required.'
+    });
+  }
+
+  if (
+    String(email).trim().toLowerCase() !== adminEmail ||
+    String(password) !== adminPassword
+  ) {
+    return res.status(401).json({
+      error: 'Invalid credentials.'
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Authentication successful.',
+    user: {
+      email: adminEmail
     }
   });
 });
