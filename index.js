@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const postsRoutes = require('./routes/posts');
+const categoriesRoutes = require('./routes/categories');
 
 dotenv.config();
 
@@ -32,7 +33,8 @@ app.get('/', (req, res) => {
     message: 'Welcome to the CodeWil Blog API.',
     documentation: '/docs',
     resources: {
-      posts: '/posts'
+      posts: '/posts',
+      categories: '/categories'
     }
   });
 });
@@ -57,12 +59,12 @@ app.get('/docs', (req, res) => {
         {
           method: 'GET',
           path: '/posts',
-          description: 'Lists all posts.'
+          description: 'Lists all posts with the assigned category.'
         },
         {
           method: 'GET',
           path: '/posts/:slug',
-          description: 'Returns one post by slug.'
+          description: 'Returns one post by slug with category details.'
         },
         {
           method: 'POST',
@@ -88,6 +90,34 @@ app.get('/docs', (req, res) => {
           method: 'DELETE',
           path: '/posts/:slug',
           description: 'Deletes a post by slug.'
+        }
+      ],
+      categories: [
+        {
+          method: 'GET',
+          path: '/categories',
+          description: 'Lists all categories.'
+        },
+        {
+          method: 'GET',
+          path: '/categories/:slug',
+          description: 'Returns one category by slug.'
+        },
+        {
+          method: 'POST',
+          path: '/categories',
+          description: 'Creates a category.',
+          body: ['name']
+        },
+        {
+          method: 'PUT',
+          path: '/categories/:slug',
+          description: 'Updates a category by slug.'
+        },
+        {
+          method: 'DELETE',
+          path: '/categories/:slug',
+          description: 'Deletes a category if no post is using it.'
         }
       ]
     }
@@ -144,6 +174,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/posts', postsRoutes);
+app.use('/categories', categoriesRoutes);
 
 // 404 handler
 app.use((req, res) => {
